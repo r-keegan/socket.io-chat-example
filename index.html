@@ -24,16 +24,59 @@
 <script>
     $(function () {
         var socket = io();
+        var isCipherCorrect = false;
+
+        function delayChat(msg, time){
+            setTimeout(function(){
+                if(!isCipherCorrect) {
+                    renderMessage('chatbot', msg)
+                }
+            }, time);
+        }
+
+        delayChat("ZKDW GR FRZV HDW?", 100);
+        delayChat("I've sent you a message, but you need to decipher it!", 1100);
+        delayChat("I've used a caesar cipher with a key of 3", 2100);
+        delayChat("Let's get started...", 3100);
+        delayChat("The idea of the caesar cipher is to encrypt each letter of the alphabet with the letter obtained by 'shifting' the alphabet a secret number of positions.", 6100);
+        delayChat("So A becomes D", 10100);
+        delayChat("B becomes E", 11100);
+        delayChat("C becomes F and so on.....", 12100);
+        delayChat("Write the answer in CAESAR CODE to pass the test and move onto the chat forum!", 15100);
+
         $('form').submit(function(e){
             e.preventDefault(); // prevents page reloading
-            socket.emit('chat message', $('#m').val());
-            $('#m').val('');
-            return false;
+            var userInput = $('#m').val();
+
+            if (isCipherCorrect) {
+                socket.emit('chat message', userInput);
+            } else {
+                var cipherAnswer = 'JUDVV';
+                //working with 'chatbot' not on socket. user can send msg's but haven't solved cipher
+
+                renderMessage('currentuser', userInput);
+                if (userInput.toUpperCase() === cipherAnswer) {
+                    renderMessage('chatbot', "You've got it!");
+                    isCipherCorrect = true;
+                } else {
+                    renderMessage('chatbot', 'Try Again!');
+                }
+                $('#m').val('');
+                return false;
+            }
         });
 
         socket.on('chat message', function(msg){
-            $('#messages').append($('<li>').text(msg));
+            if (isCipherCorrect) {
+                //probabaly location.search.slice(1)
+                renderMessage('currentuser', msg);
+            }
         });
+
+        function renderMessage(sender, msg) {
+            //ignore sender
+            $('#messages').append($('<li>').text(msg));
+        }
     });
 </script>
 
